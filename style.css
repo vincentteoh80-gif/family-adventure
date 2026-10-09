@@ -98,3 +98,16 @@ body.touch .tiny{display:none}
 #rotate{display:none;position:fixed;top:calc(96px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:#fffdf7;color:#e85d04;border-radius:10px;padding:3px 12px;font-size:13px;z-index:4;pointer-events:none}
 body.portrait[data-screen="play"] #rotate{display:block}
 @media (max-height:420px){.overlay .card{padding:12px 16px}.overlay h2{font-size:21px}.story{font-size:14px}.btn.big{font-size:17px;padding:9px 20px}.tbtn{width:64px;height:64px}.tbtn.jump{width:78px;height:78px}.hud-chip{font-size:12px;padding:2px 6px}.hud-chip svg{width:15px;height:15px}.ibtn{width:32px;height:32px}}
+
+.hud-chip .bar{display:inline-block;width:64px;height:9px;border-radius:5px;background:#fff3;overflow:hidden;margin-left:4px;vertical-align:middle}
+.hud-chip .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff8fab,#ffd23f);border-radius:5px;transition:width .2s}
+.hud-chip .bar.temp>i{background:linear-gradient(90deg,#4fc3f7,#ff7043)}
+#hProg{background:#7b2cbfcc}
+#hProg.ok{background:#2dc653dd}
+#hTemp.warn{background:#d00000cc;animation:blink .5s infinite alternate}
+.who{margin:0 0 6px;color:#7b2cbf;font-size:14px}
+.lv-tag{font-size:12px;background:#0004;border-radius:8px;padding:1px 7px;align-self:flex-start;margin-top:2px}
+.pad-r{display:flex;gap:12px;align-items:flex-end}
+.tbtn.act{display:none;background:#7e57c2aa}
+body.has-act .tbtn.act{display:flex}
+.tbtn .big{font-size:24px}

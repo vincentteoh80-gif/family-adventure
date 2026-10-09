@@ -71,9 +71,9 @@
     <h2>② 冒险地图 <span class="total" id="totalScore"></span></h2>
     <div id="levelList" class="level-list"></div>
     <div class="help">
-      <b>电脑：</b>← → 或 A / D 移动，空格 / ↑ / W 跳跃，P 暂停，R 重来。
+      <b>电脑：</b>← → 或 A / D 移动，空格 / ↑ / W 跳跃，X 画平台（Xiang 第 5 关），P 暂停，R 重来。
       <b>手机：</b>屏幕下方的 左 / 右 / 跳 按钮（建议横屏）。<br>
-      踩敌人的头可以打败它；碰到尖刺、掉进坑或被敌人撞到会失去一条命。每关要先拿到<b>钥匙</b>才能打开终点门。
+      <b>每个角色的任务都不一样！</b>同一关换 Tat、Yen、Ze 或 Xiang 来玩，故事和玩法都会变。黄色箭头指向下一个目标。踩敌人的头可以打败它。
     </div>
   </div>
 </section>
@@ -85,7 +85,9 @@
     <div class="hud-l">
       <span id="hLives" class="hud-chip"></span>
       <span class="hud-chip"><svg><use href="#i-coin"/></svg><b id="hCoins">0</b></span>
-      <span class="hud-chip"><svg><use href="#i-gift"/></svg><b id="hItems">0</b></span>
+      <span class="hud-chip prog" id="hProg"><span id="hProgL"></span><b id="hProgV"></b><i class="bar" id="hProgBar"><i></i></i></span>
+      <span class="hud-chip" id="hTemp">体温<i class="bar temp"><i id="hTempBar"></i></i></span>
+      <span class="hud-chip" id="hInk">墨水 <b id="hInkV">0</b></span>
       <span class="hud-chip" id="hStars"></span>
       <span class="hud-chip" id="hKey"><svg><use href="#i-key"/></svg></span>
       <span class="hud-chip" id="hTimeChip"><svg><use href="#i-clock"/></svg><b id="hTime">0</b></span>
@@ -106,12 +108,16 @@
       <button class="tbtn" id="tLeft" aria-label="向左"><svg><use href="#i-left"/></svg></button>
       <button class="tbtn" id="tRight" aria-label="向右"><svg><use href="#i-right"/></svg></button>
     </div>
-    <button class="tbtn jump" id="tJump" aria-label="跳"><svg><use href="#i-up"/></svg><span>跳</span></button>
+    <div class="pad-r">
+      <button class="tbtn act" id="tAct" aria-label="画"><span class="big">画</span></button>
+      <button class="tbtn jump" id="tJump" aria-label="跳"><svg><use href="#i-up"/></svg><span>跳</span></button>
+    </div>
   </div>
 
   <div id="ovIntro" class="overlay"><div class="card">
     <div class="lv-badge" id="iBadge"></div>
     <h2 id="iTitle"></h2>
+    <p class="who" id="iWho"></p>
     <div id="iStory" class="story"></div>
     <ul id="iGoals" class="goals"></ul>
     <button class="btn big" id="iStart">开始冒险</button>
@@ -155,6 +161,7 @@
 <script src="levels.js"></script>
 <script src="engine.js"></script>
 <script src="draw.js"></script>
+<script src="draw2.js"></script>
 <script src="game.js"></script>
 </body>
 </html>

@@ -103,13 +103,22 @@
       b.style.setProperty('--c1', L.theme.sky[0]); b.style.setProperty('--c2', L.theme.sky[1]);
       var stars = '';
       for (var k = 0; k < 3; k++) stars += '<svg><use href="#' + (k < (best.stars || 0) ? 'i-star' : 'i-star0') + '"/></svg>';
-      b.innerHTML = '<span class="lv-no">第 ' + (i + 1) + ' 关</span><span class="lv-year">' + L.year + '</span><b>' + L.title + '</b>' +
+      var R = E.getRole(L, save.char);
+      b.innerHTML = '<span class="lv-no">第 ' + (i + 1) + ' 关</span><span class="lv-year">' + L.year + '</span><b>' + L.title + '</b><span class="lv-tag">玩法：' + goalTag(R) + '</span>' +
         (locked ? '<span class="lock"><svg><use href="#i-lock"/></svg>未解锁</span>' : '<span class="stars">' + stars + '</span>');
       b.disabled = locked;
       b.onclick = function () { startLevel(i); };
       ll.appendChild(b);
     });
     $('totalScore').textContent = total ? '总分 ' + total : '';
+  }
+  var GOALNAME = { escort: '陪伴', follow: '带路', race: '追人', carry: '抱着走', photo: '拍照', collect: '收集', budget: '存钱', key: '寻宝', reach: '冲终点',
+    checklist: '按顺序准备', deliver: '送口罩', stealth: '潜行', catchkids: '抓偷玩', clean: '打扫', catch: '接东西' };
+  function goalTag(R) {
+    var t = GOALNAME[R.goal] || '闯关';
+    if (R.goal === 'carry') t = { bride: '抱新娘', babyze: '抱宝宝', babyxiang: '抱宝宝', ball: '带球射门' }[R.cargo] || t;
+    if (R.autoscroll) t += '·自动前进'; if (R.temp) t += '·保暖'; if (R.fog) t += '·大雾'; if (R.draw) t = '画平台'; if (R.slowFood) t = '避开美食'; if (R.time) t += '·限时';
+    return t;
   }
   $('mSound').onclick = function () { save.sound = !save.sound; writeSave(); buildMenu(); sfx('coin'); };
   $('mReset').onclick = function () {
@@ -122,7 +131,7 @@
   var cv = $('cv'), ctx = cv.getContext('2d');
   var S = null, cur = 0, mode = 'none', camX = 0, parts = [], shake = 0, raf = 0, last = 0, acc = 0, frame = 0;
   var view = { w: 800, scale: 1, ox: 0, oy: 0, dpr: 1 };
-  var keys = {}, touch = { left: false, right: false, jump: false };
+  var keys = {}, touch = { left: false, right: false, jump: false, action: false };
 
   function resize() {
     var w = window.innerWidth, h = window.innerHeight, dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -142,11 +151,15 @@
     S = E.create(L, save.char); parts = []; camX = 0; shake = 0;
     show('play'); resize();
     $('iBadge').textContent = '第 ' + (i + 1) + ' 关 · ' + L.year;
+    var R = S.role;
     $('iTitle').textContent = L.title;
-    $('iStory').innerHTML = L.story.map(function (l) { return '<p>' + esc(l) + '</p>'; }).join('');
-    var goals = ['收集 <b>' + esc(L.theme.itemName) + '</b>、金币和 3 颗星星', '拿到 <b>' + esc(L.keyName) + '</b>（钥匙）', '走进终点 <b>' + esc(L.gateName) + '</b>'];
-    if (L.time) goals.push('限时 <b>' + L.time + ' 秒</b>！');
-    $('iGoals').innerHTML = goals.map(function (g) { return '<li>' + g + '</li>'; }).join('');
+    $('iWho').innerHTML = '你是 <b>' + CHARS[save.char].name + '</b>（' + CHARS[save.char].role + '）· 玩法：' + goalTag(R);
+    $('iStory').innerHTML = (R.story || []).map(function (l) { return '<p>' + esc(l) + '</p>'; }).join('');
+    var goals = (R.goalText || []).slice();
+    if (R.time) goals.push('限时 ' + R.time + ' 秒！');
+    goals.push('顺手收集金币和 3 颗星星可以加分');
+    $('iGoals').innerHTML = goals.map(function (g) { return '<li>' + esc(g) + '</li>'; }).join('');
+    document.body.classList.toggle('has-act', !!R.draw);
     $('levelTag').textContent = '第' + (i + 1) + '关 ' + L.title + ' · ' + CHARS[save.char].name;
     mode = 'intro'; overlay('ovIntro'); hudCache = {}; updateHud(true);
     startLoop();
@@ -174,15 +187,15 @@
     $('wTitle').textContent = last ? '全家通关！' : '通关！';
     var st = ''; for (var k = 0; k < 3; k++) st += '<svg><use href="#' + (k < S.starsN ? 'i-star' : 'i-star0') + '"/></svg>';
     $('wStars').innerHTML = st;
-    $('wInfo').innerHTML = '分数 <b>' + S.score + '</b>　金币 ' + S.coinsN + '/' + S.totalCoins + '　' + esc(L.theme.itemName) + ' ' + S.itemsN + '/' + S.totalItems +
-      (last ? '<br>Tat、Yen、Ze、Xiang 一起完成了全部冒险！' : '<br>下一关已解锁：<b>' + esc(LV[cur + 1].title) + '</b>');
+    $('wInfo').innerHTML = '分数 <b>' + S.score + '</b>　金币 ' + S.coinsN + '/' + S.totalCoins + '　剩余命 ' + S.lives +
+      (last ? '<br>Tat、Yen、Ze、Xiang 一起完成了全部冒险！<br>换一个角色再玩，故事会不一样哦！' : '<br>下一关已解锁：<b>' + esc(LV[cur + 1].title) + '</b><br>换个角色玩这一关，任务会不一样！');
     $('wNext').textContent = last ? '回到地图' : '下一关';
     setTimeout(function () { overlay('ovWin'); }, 500);
   }
   function over() { mode = 'over'; sfx('over'); setTimeout(function () { overlay('ovOver'); }, 600); }
 
   // ---------- 输入 ----------
-  var KEYMAP = { ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', Space: 'jump', ArrowUp: 'jump', KeyW: 'jump' };
+  var KEYMAP = { ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', Space: 'jump', ArrowUp: 'jump', KeyW: 'jump', KeyX: 'action', KeyK: 'action', KeyJ: 'action' };
   window.addEventListener('keydown', function (e) {
     if (document.body.dataset.screen !== 'play') return;
     var k = KEYMAP[e.code];
@@ -196,8 +209,8 @@
   document.addEventListener('visibilitychange', function () { if (document.hidden && mode === 'play') pause(); });
 
   // 触屏按钮：支持多点触控（左右 + 跳同时按）
-  var tb = { tLeft: 'left', tRight: 'right', tJump: 'jump' };
-  function resetTouch() { touch.left = touch.right = touch.jump = false; Object.keys(tb).forEach(function (id) { $(id).classList.remove('on'); }); }
+  var tb = { tLeft: 'left', tRight: 'right', tJump: 'jump', tAct: 'action' };
+  function resetTouch() { touch.left = touch.right = touch.jump = touch.action = false; Object.keys(tb).forEach(function (id) { $(id).classList.remove('on'); }); }
   Object.keys(tb).forEach(function (id) {
     var el = $(id), k = tb[id];
     var on = function (e) { e.preventDefault(); touch[k] = true; el.classList.add('on'); if (mode === 'intro') begin(), touch[k] = k !== 'jump'; };
@@ -219,7 +232,7 @@
     if (steps >= 5) acc = 0;
     render();
   }
-  function input() { if (window.__inputHook) return window.__inputHook(); return { left: !!(keys.left || touch.left), right: !!(keys.right || touch.right), jump: !!(keys.jump || touch.jump) }; }
+  function input() { if (window.__inputHook) return window.__inputHook(); return { left: !!(keys.left || touch.left), right: !!(keys.right || touch.right), jump: !!(keys.jump || touch.jump), action: !!(keys.action || touch.action) }; }
 
   var lockToastT = 0;
   function tick() {
@@ -234,7 +247,7 @@
     for (var j = parts.length - 1; j >= 0; j--) { var p = parts[j]; p.x += p.vx; p.y += p.vy; p.vy += p.g; p.life--; if (p.life <= 0) parts.splice(j, 1); }
     if (shake > 0) shake--;
     // 镜头
-    if (S) { var target = S.player.x + S.player.w / 2 - view.w * 0.42; target = Math.max(0, Math.min(S.w * T - view.w, target)); camX += (target - camX) * 0.15; if (Math.abs(target - camX) < 0.3) camX = target; }
+    if (S) { var target = S.player.x + S.player.w / 2 - view.w * 0.42; target = Math.max(0, Math.min(S.w * T - view.w, target)); if (S.role.autoscroll) target = Math.max(target, Math.min(S.scroll, S.w * T - view.w)); camX += (target - camX) * 0.15; if (S.role.autoscroll && camX < S.scroll) camX = Math.min(S.scroll, S.w * T - view.w); if (Math.abs(target - camX) < 0.3) camX = target; }
     updateHud();
   }
   function burst(x, y, color, n, txt) {
@@ -247,14 +260,30 @@
       case 'jump': sfx('jump'); burst(e.x, e.y, '#ffffffaa', 4); break;
       case 'coin': sfx('coin'); burst(e.x, e.y, '#ffd23f', 5, '+10'); break;
       case 'star': sfx('star'); burst(e.x, e.y, '#fff176', 14, '+500'); toast('星星 ' + S.starsN + '/3'); break;
-      case 'item': sfx('item'); burst(e.x, e.y, '#ff8fab', 8, '+100'); if (L.theme.item === 'daily') toast(['口罩', '水壶', '钱包'][e.n % 3] + ' 带上了！'); break;
-      case 'key': sfx('key'); burst(e.x, e.y, '#ffd54f', 16, '+200'); toast('拿到' + L.keyName + '！终点门已打开'); break;
+      case 'item': sfx('item'); burst(e.x, e.y, '#ff8fab', 8, '+100'); if (S.role.goal === 'checklist') toast({ mask: '戴上口罩', bottle: '带上水壶', wallet: '带上钱包' }[e.kind] + '！'); if (S.role.draw) toast('墨水 +1'); break;
+      case 'key': sfx('key'); burst(e.x, e.y, '#ffd54f', 16, '+200'); toast('拿到' + (S.role.keyName || '钥匙') + '！'); break;
       case 'stomp': sfx('stomp'); burst(e.x, e.y, '#ffffff', 8, '+100'); break;
       case 'hurt': sfx('hurt'); shake = 14; burst(e.x + 10, e.y + 10, '#ff5252', 12);
-        toast(e.why === 'time' ? '时间到！Yen 回来了，再来！' : e.why === 'fall' ? '掉下去了！' : e.why === 'spike' ? '好痛！小心尖刺' : '被撞到了！');
+        toast({ time: '时间到！再来！', fall: '掉下去了！', spike: '好痛！小心尖刺', race: 'Tat 跑到酒桌了！再追一次', cold: '冻僵了！记得捡外套', caught: '被监控拍到了！', gourd: '碰到苦瓜了！', scroll: '掉队了！跟上画面' }[e.why] || '被撞到了！');
         break;
       case 'checkpoint': sfx('checkpoint'); toast('存档点已激活'); break;
-      case 'locked': if (frame - lockToastT > 90) { lockToastT = frame; sfx('locked'); toast('需要先找到' + L.keyName + '！'); } break;
+      case 'msg': sfx('locked'); toast(e.text); break;
+      case 'drop': sfx('hurt'); shake = 8; toast(e.why === 'friend' ? '被朋友拉去喝酒了！快回去！' : ({ bride: '新娘掉下来了！回去抱她', babyze: '宝宝掉了！快回去抱', babyxiang: '宝宝掉了！快回去抱', ball: '球被抢走了！快去捡' }[S.cargo.kind])); break;
+      case 'pickup': sfx('item'); burst(e.x + 10, e.y, '#ff8fab', 10); toast({ bride: '抱起新娘！', babyze: '抱起宝宝！', babyxiang: '抱起宝宝！', ball: '拿回足球！' }[S.cargo.kind]); break;
+      case 'cargoBack': toast('它回到存档点了'); break;
+      case 'npcChat': toast('Tat 停下来和朋友聊天……快追！'); break;
+      case 'caught': sfx('key'); burst(e.x + 10, e.y, '#ff8fab', 18, '抓到了!'); toast('抓到 Tat 了！一起去礼堂'); break;
+      case 'npcWarp': toast(CHARS[e.id] ? CHARS[e.id].name + ' 追上来了' : '追上来了'); break;
+      case 'deliver': sfx('item'); burst(e.x + 10, e.y, '#64b5f6', 12, '+200'); toast(CHARS[e.id].name + ' 戴好口罩了！'); break;
+      case 'catchKid': sfx('key'); burst(e.x + 10, e.y, '#ffd54f', 16, '+300'); toast('抓到 ' + CHARS[e.id].name + ' 偷玩手机！'); break;
+      case 'photo': sfx('star'); burst(e.x, e.y, '#ffffff', 20, '咔嚓!'); toast('拍到一张 ' + S.photosN + '/' + S.need); break;
+      case 'deviceOff': sfx('checkpoint'); burst(e.x, e.y, '#90a4ae', 8, '关掉!'); toast((e.kind === 'tv' ? '电视' : '手机') + '关掉了 ' + S.devOff + '/' + S.need); break;
+      case 'drink': sfx('item'); burst(e.x, e.y, '#4fc3f7', 10, '咕噜'); toast('喝水了！'); break;
+      case 'full': sfx('locked'); toast('吃不下了……走不动'); break;
+      case 'pay': sfx('hurt'); shake = 6; burst(e.x + 10, e.y, '#ffd23f', 8, '-RM15'); break;
+      case 'draw': sfx('jump'); burst(e.x + 10, e.y, '#7e57c2', 8); break;
+      case 'lantern': sfx('item'); toast('灯笼照亮了四周！'); break;
+      case 'npcWin': break;
     }
   }
   var toastT = 0;
@@ -267,10 +296,16 @@
     if (!S) return;
     var h = ''; for (var i = 0; i < S.maxLives; i++) h += '<svg class="' + (i < S.lives ? '' : 'off') + '"><use href="#i-heart"/></svg>';
     setH('hLives', h, true);
-    setH('hCoins', S.coinsN + '/' + S.totalCoins); setH('hItems', S.itemsN + '/' + S.totalItems); setH('hScore', String(S.score));
+    setH('hCoins', S.coinsN + '/' + S.totalCoins); setH('hScore', String(S.score));
+    var pg = E.progress(S), done = E.goalOK(S);
+    setH('hProgL', pg.label); setH('hProgV', pg.bar ? '' : (pg.max === 1 ? (pg.v ? '✓' : '') : pg.v + '/' + pg.max));
+    $('hProgBar').style.display = pg.bar ? '' : 'none'; if (pg.bar) $('hProgBar').firstChild.style.width = Math.max(0, Math.min(100, pg.v)) + '%';
+    $('hProg').classList.toggle('ok', done);
+    $('hTemp').style.display = S.role.temp ? '' : 'none'; if (S.role.temp) { $('hTempBar').style.width = Math.max(0, S.temp) + '%'; $('hTemp').classList.toggle('warn', S.temp < 30); }
+    $('hInk').style.display = S.role.draw ? '' : 'none'; if (S.role.draw) setH('hInkV', String(S.ink));
     var st = ''; for (var k = 0; k < 3; k++) st += '<svg><use href="#' + (k < S.starsN ? 'i-star' : 'i-star0') + '"/></svg>';
     setH('hStars', st, true);
-    $('hKey').classList.toggle('got', S.hasKey);
+    $('hKey').style.display = 'none';
     $('hTimeChip').style.display = S.timeLimit ? '' : 'none';
     if (S.timeLimit) { setH('hTime', String(Math.ceil(S.timer / 60))); $('hTimeChip').classList.toggle('warn', S.timer < 15 * 60); }
     $('bSound').innerHTML = '<svg><use href="#' + (save.sound ? 'i-sound' : 'i-mute') + '"/></svg>';
@@ -290,26 +325,68 @@
     var cx = Math.round(camX), t = frame;
     D.background(ctx, th, cx, view.w, MAP_H, t);
     D.tiles(ctx, S, th, cx, view.w);
+    var R = S.role, gname = R.gateName || LV[cur].gateName, goalDone = E.goalOK(S);
+    if (R.temp) D.wind(ctx, S, cx, view.w, t);
     S.movers.forEach(function (m) { if (m.x + m.w > cx && m.x < cx + view.w) D.mover(ctx, m, th, cx, th.far); });
+    S.temps.forEach(function (q) { D.drawn(ctx, q, cx); });
     S.checkpoints.forEach(function (c) { D.checkpoint(ctx, c, cx, t); });
-    if (S.gate) D.gate(ctx, S.gate, cx, LV[cur].gateName, S.hasKey, t);
+    S.hides.forEach(function (hz) { D.hide(ctx, hz, cx, R.goal === 'stealth' && S.hidden && Math.abs(hz.x + 16 - S.player.x) < 30); });
+    S.devices.forEach(function (dv) { D.device(ctx, dv, cx, t, R.goal === 'stealth'); });
+    if (S.fountain) D.fountain(ctx, S.fountain, cx, R.goal === 'checklist' && S.order[S.step] === 'drink');
+    if (S.table) D.table(ctx, S.table, cx);
+    S.friends.forEach(function (f) { D.friend(ctx, f, cx, t); });
+    if (R.goal === 'photo') S.spots.forEach(function (sp) { D.spot(ctx, sp, cx, t); });
+    if (S.gate) D.gate(ctx, S.gate, cx, gname, goalDone, t);
     var vis = function (o) { return o.x > cx - 30 && o.x < cx + view.w + 30; };
     var bob = Math.sin(t * 0.07) * 2;
     S.coins.forEach(function (o) { if (!o.got && vis(o)) D.coin(ctx, o.x - cx, o.y + bob, t + o.x); });
-    S.items.forEach(function (o) { if (!o.got && vis(o)) D.item(ctx, th.item, o.x - cx, o.y + bob, t, o.n); });
+    S.items.forEach(function (o) { if (!o.got && vis(o)) D.item(ctx, o.kind, o.x - cx, o.y + bob, t, o.n); });
+    S.lanterns.forEach(function (o) { if (!o.got && vis(o)) D.lantern2(ctx, o, cx, t); });
     S.stars.forEach(function (o) { if (!o.got && vis(o)) { ctx.save(); ctx.fillStyle = '#fff59d55'; ctx.beginPath(); ctx.arc(o.x - cx, o.y + bob, 17, 0, 7); ctx.fill(); ctx.restore(); D.star(ctx, o.x - cx, o.y + bob, 12, '#ffd23f', '#a66d00'); } });
-    S.keys.forEach(function (o) { if (!o.got) D.key(ctx, o.x - cx, o.y + bob, t); });
+    S.keys.forEach(function (o) { if (!o.got) { if (R.keyKind) D.item(ctx, R.keyKind, o.x - cx, o.y + bob, t, 0); else D.key(ctx, o.x - cx, o.y + bob, t); } });
     S.enemies.forEach(function (e) {
       if (!e.alive && e.dead <= 0) return;
       if (e.x + e.w < cx - 20 || e.x > cx + view.w + 20) return;
       if (e.kind === 'walk') D.enemy(ctx, e, th.enemy, cx, t); else D.flyer(ctx, e, th.flyer, cx, t);
     });
+    S.fall.forEach(function (f) { D.fallItem(ctx, f, cx, t); });
+    // 站着的家人（装饰）
+    (S.decor || []).forEach(function (m) { drawChar(ctx, m.id, m.x - cx, m.y, { s: 0.9, facing: -1, time: t + m.x, mask: true }); });
+    // 同行角色
+    S.npcs.forEach(function (n) {
+      if (n.ai === 'wander' && n.done) return;
+      var id = n.id, o = { s: 0.95, facing: n.facing, t: n.anim * 2.2, time: t + 50, state: !n.onGround ? 'jump' : Math.abs(n.vx) > 0.3 ? 'run' : 'idle' };
+      if (id === 'babyxiang') { id = 'xiang'; o.baby = true; o.s = 0.6; }
+      if (S.charId === 'yen' && LV[cur].id === 5 && id === 'ze') o.s = 0.72;
+      if (n.ai === 'wander') { o.phone = n.phone; }
+      if (n.ai === 'stand') { o.mask = n.done; o.facing = -1; }
+      drawChar(ctx, id, n.x + n.w / 2 - cx, n.y + n.h + 1, o);
+      if (n.ai === 'race' && n.pause > 0) { ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#e65100'; ctx.fillText('干杯！', n.x + 10 - cx, n.y - 22); }
+    });
+    // 监控
+    S.cams.forEach(function (c) { D.cam(ctx, c, cx, R.goal === 'stealth'); });
+    // 货物（放下的时候）
+    var cg = S.cargo;
+    var drawCargo = function (x, y, carried) {
+      if (cg.kind === 'ball') { D.item(ctx, 'ball', x, y - 10, t, 0); return; }
+      var bid = cg.kind === 'bride' ? 'yen' : cg.kind === 'babyze' ? 'ze' : 'xiang';
+      drawChar(ctx, bid, x, y, { s: cg.kind === 'bride' ? 0.8 : 0.55, bride: cg.kind === 'bride', baby: cg.kind !== 'bride', facing: S.player.facing, time: t, noShadow: carried });
+    };
+    if (cg && !cg.carried) { drawCargo(cg.x + 11 - cx, cg.y + cg.h, false); if (Math.floor(t / 15) % 2) { ctx.fillStyle = '#ff5252'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('!', cg.x + 11 - cx, cg.y - 30); } }
     // 玩家
     var p = S.player;
     if (!(p.inv > 0 && Math.floor(p.inv / 4) % 2)) {
       var stt = !p.onGround ? (p.vy < 0 ? 'jump' : 'fall') : (Math.abs(p.vx) > 0.4 ? 'run' : 'idle');
-      drawChar(ctx, save.char, p.x + p.w / 2 - cx, p.y + p.h + 1, { s: 0.95, facing: p.facing, t: p.anim * 2.2, state: stt, time: t, hurt: p.inv > 70 });
+      var pmask = R.goal === 'checklist' && S.step > 0;
+      if (cg && cg.carried && cg.kind === 'ball') D.item(ctx, 'ball', p.x + p.w / 2 - cx + p.facing * 14, p.y + p.h - 9 + (stt === 'run' ? Math.abs(Math.sin(p.anim * 2.2)) * -3 : 0), t, 0);
+      drawChar(ctx, save.char, p.x + p.w / 2 - cx, p.y + p.h + 1, { s: 0.95, facing: p.facing, t: p.anim * 2.2, state: stt, time: t, hurt: p.inv > 70, bride: false, mask: pmask });
+      if (cg && cg.carried && cg.kind !== 'ball') drawCargo(p.x + p.w / 2 - cx + p.facing * 3, p.y + 14 + (cg.kind === 'bride' ? 2 : 4), true);
+      if (S.slow > 0) { ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#e65100'; ctx.fillText('好饱…', p.x + 10 - cx, p.y - 26); }
     }
+    // 大雾
+    if (R.fog) D.fog(ctx, p.x + p.w / 2 - cx, p.y + p.h / 2, S.light > 0 ? 260 : 120, view.w, VIEW_TOP, VIEW_H);
+    // 目标箭头
+    var hn = E.hint(S); if (hn && mode === 'play') D.arrow(ctx, hn.x, hn.y, cx, view.w, VIEW_TOP, t);
     // 粒子
     parts.forEach(function (q) {
       ctx.globalAlpha = Math.min(1, q.life / 20);
