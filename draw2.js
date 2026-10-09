@@ -32,7 +32,7 @@
     if (!done) baseItem(ctx, kind, x, y, t, n);
   };
 
-  D.friend = function (ctx, f, camX, t) {
+  D.friend = function (ctx, f, camX, t, lab) {
     var x = f.x - camX + f.w / 2, y = f.y + f.h;
     ctx.save(); ctx.translate(x, y); ctx.lineWidth = 1.5; ctx.strokeStyle = '#3e2723';
     ctx.fillStyle = '#546e7a'; rr(ctx, -8, -22, 16, 16, 4); ctx.fill(); ctx.stroke();
@@ -44,7 +44,7 @@
     var up = Math.sin(t * 0.08) * 4;
     ctx.save(); ctx.translate(-14, -20 + up); ctx.fillStyle = '#ffca28'; rr(ctx, -5, -8, 10, 12, 2); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#fff'; rr(ctx, -5, -10, 10, 4, 2); ctx.fill(); ctx.restore();
     ctx.restore();
-    label(ctx, '来喝一杯！', x, f.y - 14, 'rgba(230,81,0,0.85)');
+    if (lab !== '') label(ctx, lab || '来喝一杯！', x, f.y - 14, 'rgba(230,81,0,0.85)');
   };
   D.table = function (ctx, tb, camX) {
     var x = tb.x - camX, y = tb.y;

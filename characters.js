@@ -9,7 +9,13 @@
     ze:    { name: 'Ze',    role: '大儿子', skill: '足球小将：跑得最快', size: 0.9, wide: 0.9,
              skin: '#ffd9bf', hair: '#18181b', shirt: '#f7f7f7', shirt2: '#1f8f4e', pants: '#2d3a58', shoe: '#1f8f4e', style: 'neat' },
     xiang: { name: 'Xiang', role: '小儿子', skill: '弹跳达人：跳得最高', size: 0.82, wide: 1.08,
-             skin: '#ffdcc2', hair: '#232326', shirt: '#ffffff', shirt2: '#e53935', pants: '#2f4a6b', shoe: '#e53935', style: 'buzz' }
+             skin: '#ffdcc2', hair: '#232326', shirt: '#ffffff', shirt2: '#e53935', pants: '#2f4a6b', shoe: '#e53935', style: 'buzz' },
+    // 配角（不戴眼镜）
+    amin:  { name: '阿明', role: '同事', size: 1.0, wide: 1.05, skin: '#f2c9a5', hair: '#3e2723', shirt: '#64b5f6', shirt2: '#1e88e5', pants: '#455a64', shoe: '#3e2723', style: 'neat', noGlasses: true },
+    lily:  { name: '八卦同事', role: '同事', size: 0.97, wide: 0.95, skin: '#ffe0cc', hair: '#8d4a2b', shirt: '#ffd54f', shirt2: '#ffb300', pants: '#6d4c41', shoe: '#6d4c41', style: 'long', noGlasses: true },
+    booth: { name: '售票员', role: '', size: 0.97, wide: 0.95, skin: '#ffdcc6', hair: '#212121', shirt: '#e53935', shirt2: '#b71c1c', pants: '#263238', shoe: '#263238', style: 'long', noGlasses: true },
+    pop:   { name: '爆米花阿伯', role: '', size: 1.0, wide: 1.15, skin: '#e8b98e', hair: '#bdbdbd', shirt: '#fff8e1', shirt2: '#ff7043', pants: '#5d4037', shoe: '#3e2723', style: 'buzz', noGlasses: true },
+    host:  { name: '主持人', role: '', size: 1.0, wide: 1.0, skin: '#f5cba7', hair: '#1a1a1a', shirt: '#37474f', shirt2: '#ffffff', pants: '#263238', shoe: '#111', style: 'neat', noGlasses: true }
   };
   var LINE = '#4a3426';
 
@@ -124,6 +130,7 @@
       ctx.fill(); ctx.stroke();
     }
 
+    if (o.back) { ctx.fillStyle = C.hair; ctx.beginPath(); ctx.ellipse(1, hy - 1, 14, 13, 0, 0, 7); ctx.fill(); ctx.stroke(); if (C.style === 'long') { ctx.fillRect(-13, hy, 27, 14); } ctx.restore(); return; }
     // 眼睛（眨眼）
     var blink = ((o.time || 0) % 220) < 8;
     var ex1 = -3, ex2 = 7.5, ey = hy + 1;
@@ -133,12 +140,14 @@
       ctx.beginPath(); ctx.ellipse(ex1, ey, 1.9, 2.4, 0, 0, 7); ctx.ellipse(ex2, ey, 1.9, 2.4, 0, 0, 7); ctx.fill();
       ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(ex1 + 0.7, ey - 0.9, 0.7, 0, 7); ctx.arc(ex2 + 0.7, ey - 0.9, 0.7, 0, 7); ctx.fill();
     }
-    // 眼镜（四个人都戴）
+    // 眼镜（四个家人都戴）
+    if (!C.noGlasses) {
     ctx.lineWidth = 1.7; ctx.strokeStyle = '#111';
     ctx.fillStyle = 'rgba(200,230,255,0.25)';
     rr(ctx, ex1 - 4.6, ey - 3.6, 9.2, 7.2, 2.2); ctx.fill(); ctx.stroke();
     rr(ctx, ex2 - 4.6, ey - 3.6, 9.2, 7.2, 2.2); ctx.fill(); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(ex1 + 4.6, ey - 1); ctx.lineTo(ex2 - 4.6, ey - 1); ctx.moveTo(ex1 - 4.6, ey - 1); ctx.lineTo(-12, ey - 2); ctx.stroke();
+    }
     ctx.strokeStyle = LINE; ctx.lineWidth = LW;
 
     // 腮红 + 嘴巴
