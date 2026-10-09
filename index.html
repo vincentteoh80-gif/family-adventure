@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>一家四口的迷你冒险</title>
+<meta name="description" content="四个人，一段故事，无数有趣任务。">
+<meta name="theme-color" content="#ff9f1c">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="家庭冒险">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-heart" viewBox="0 0 24 24"><path fill="#ff4d6d" stroke="#8a1c2f" stroke-width="1.5" d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.2 0 3.6 1.3 5.3 3.2 1.7-1.9 3.1-3.2 5.3-3.2 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></symbol>
+  <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#ffd23f" stroke="#a66d00" stroke-width="2"/><rect x="10.5" y="7" width="3" height="10" rx="1.5" fill="#e3a008"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path fill="#ffd23f" stroke="#a66d00" stroke-width="1.5" stroke-linejoin="round" d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z"/></symbol>
+  <symbol id="i-star0" viewBox="0 0 24 24"><path fill="#ffffff55" stroke="#ffffffaa" stroke-width="1.5" stroke-linejoin="round" d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="7" cy="12" r="4.5" fill="none" stroke="#f4b400" stroke-width="3"/><path d="M11 12h10M17 12v4M20 12v3" stroke="#f4b400" stroke-width="3" stroke-linecap="round"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="12" rx="2" fill="#4dd0e1" stroke="#00695c" stroke-width="1.5"/><path d="M12 9v12M3 13h18" stroke="#00695c" stroke-width="1.5"/><path d="M12 9c-2-4-6-4-6-1s6 1 6 1zm0 0c2-4 6-4 6-1s-6 1-6 1z" fill="#ff7043"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#fff" stroke="#333" stroke-width="2"/><path d="M12 7v5l3 2" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2" fill="#90a4ae"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="#90a4ae" stroke-width="2.5"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 4L7 12l8 8" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 4l8 8-8 8" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M4 16l8-8 8 8" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1" fill="#fff"/><rect x="14" y="5" width="4" height="14" rx="1" fill="#fff"/></symbol>
+  <symbol id="i-restart" viewBox="0 0 24 24"><path d="M19 12a7 7 0 1 1-2.1-5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><path d="M18 2.5v5h-5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#fff"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#fff"/><path d="M16 9l5 6M21 9l-5 6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M9 4v14M15 6v14" stroke="#fff" stroke-width="2"/></symbol>
+</svg>
+
+<!-- 登录 -->
+<section id="login" class="screen show">
+  <div class="card login-card">
+    <canvas id="loginArt" width="560" height="200"></canvas>
+    <h1>一家四口的迷你冒险</h1>
+    <p class="sub">四个人，一段故事，无数有趣任务。</p>
+    <form id="loginForm" autocomplete="on">
+      <input type="password" id="pw" placeholder="请输入家庭密码" autocomplete="current-password" required>
+      <label class="check"><input type="checkbox" id="remember" checked> 在这台设备上记住我</label>
+      <button type="submit" class="btn big" id="loginBtn">进入游戏</button>
+      <p id="loginMsg" class="msg"></p>
+    </form>
+  </div>
+</section>
+
+<!-- 菜单 / 冒险地图 -->
+<section id="menu" class="screen">
+  <div class="menu-wrap">
+    <header class="menu-head">
+      <div>
+        <h1>一家四口的迷你冒险</h1>
+        <p class="sub">四个人，一段故事，无数有趣任务。</p>
+      </div>
+      <div class="head-btns">
+        <button class="btn small" id="mSound"></button>
+        <button class="btn small ghost" id="mReset">清除进度</button>
+        <button class="btn small ghost" id="mLogout">退出登录</button>
+      </div>
+    </header>
+    <h2>① 选择角色</h2>
+    <div id="charList" class="char-list"></div>
+    <h2>② 冒险地图 <span class="total" id="totalScore"></span></h2>
+    <div id="levelList" class="level-list"></div>
+    <div class="help">
+      <b>电脑：</b>← → 或 A / D 移动，空格 / ↑ / W 跳跃，P 暂停，R 重来。
+      <b>手机：</b>屏幕下方的 左 / 右 / 跳 按钮（建议横屏）。<br>
+      踩敌人的头可以打败它；碰到尖刺、掉进坑或被敌人撞到会失去一条命。每关要先拿到<b>钥匙</b>才能打开终点门。
+    </div>
+  </div>
+</section>
+
+<!-- 游戏 -->
+<section id="play" class="screen">
+  <canvas id="cv"></canvas>
+  <div id="hud">
+    <div class="hud-l">
+      <span id="hLives" class="hud-chip"></span>
+      <span class="hud-chip"><svg><use href="#i-coin"/></svg><b id="hCoins">0</b></span>
+      <span class="hud-chip"><svg><use href="#i-gift"/></svg><b id="hItems">0</b></span>
+      <span class="hud-chip" id="hStars"></span>
+      <span class="hud-chip" id="hKey"><svg><use href="#i-key"/></svg></span>
+      <span class="hud-chip" id="hTimeChip"><svg><use href="#i-clock"/></svg><b id="hTime">0</b></span>
+    </div>
+    <div class="hud-r">
+      <span class="hud-chip score">分数 <b id="hScore">0</b></span>
+      <button class="ibtn" id="bPause" title="暂停"><svg><use href="#i-pause"/></svg></button>
+      <button class="ibtn" id="bRestart" title="重来"><svg><use href="#i-restart"/></svg></button>
+      <button class="ibtn" id="bSound" title="音效"><svg><use href="#i-sound"/></svg></button>
+      <button class="ibtn" id="bMap" title="地图"><svg><use href="#i-map"/></svg></button>
+    </div>
+  </div>
+  <div id="levelTag"></div>
+  <div id="toast"></div>
+
+  <div id="touch">
+    <div class="pad-l">
+      <button class="tbtn" id="tLeft" aria-label="向左"><svg><use href="#i-left"/></svg></button>
+      <button class="tbtn" id="tRight" aria-label="向右"><svg><use href="#i-right"/></svg></button>
+    </div>
+    <button class="tbtn jump" id="tJump" aria-label="跳"><svg><use href="#i-up"/></svg><span>跳</span></button>
+  </div>
+
+  <div id="ovIntro" class="overlay"><div class="card">
+    <div class="lv-badge" id="iBadge"></div>
+    <h2 id="iTitle"></h2>
+    <div id="iStory" class="story"></div>
+    <ul id="iGoals" class="goals"></ul>
+    <button class="btn big" id="iStart">开始冒险</button>
+    <p class="tiny">电脑按空格也可以开始</p>
+  </div></div>
+
+  <div id="ovWin" class="overlay"><div class="card">
+    <h2 id="wTitle">通关！</h2>
+    <div id="wStars" class="big-stars"></div>
+    <p id="wInfo" class="story"></p>
+    <div class="row">
+      <button class="btn big" id="wNext">下一关</button>
+      <button class="btn" id="wAgain">再玩一次</button>
+      <button class="btn ghost" id="wMap">冒险地图</button>
+    </div>
+  </div></div>
+
+  <div id="ovOver" class="overlay"><div class="card">
+    <h2>哎呀，命用完了！</h2>
+    <p class="story" id="oInfo">别灰心，再来一次！</p>
+    <div class="row">
+      <button class="btn big" id="oRetry">重新开始</button>
+      <button class="btn ghost" id="oMap">冒险地图</button>
+    </div>
+  </div></div>
+
+  <div id="ovPause" class="overlay"><div class="card">
+    <h2>暂停中</h2>
+    <div class="row">
+      <button class="btn big" id="pResume">继续</button>
+      <button class="btn" id="pRestart">重来</button>
+      <button class="btn ghost" id="pMap">冒险地图</button>
+    </div>
+  </div></div>
+</section>
+
+<div id="rotate">横屏玩更好</div>
+
+<script src="js/config.js"></script>
+<script src="js/characters.js"></script>
+<script src="js/levels.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/draw.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
