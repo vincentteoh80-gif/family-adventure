@@ -3,7 +3,11 @@
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
   var R = window.RPG, DATA = window.RPG_DATA, CFG = window.GAME_CONFIG, T = R.T;
-  var SAVE_KEY = 'ffa_rpg_ch1', OPT_KEY = 'ffa_rpg_opt';
+  var SAVE_KEY = 'ffa_rpg_save2', PROG_KEY = 'ffa_rpg_prog', OPT_KEY = 'ffa_rpg_opt';
+  var FACE = { tat: 'face-tat.png', yen: 'face-yen.png', ze: 'face-ze.png', xiang: 'face-xiang.png' };
+  var prog = { done: {}, carry: {} };
+  try { prog = Object.assign(prog, JSON.parse(localStorage.getItem(PROG_KEY)) || {}); } catch (e) {}
+  function saveProg() { try { localStorage.setItem(PROG_KEY, JSON.stringify(prog)); } catch (e) {} }
   var opt = { sound: true };
   try { opt = Object.assign(opt, JSON.parse(localStorage.getItem(OPT_KEY)) || {}); } catch (e) {}
   function saveOpt() { try { localStorage.setItem(OPT_KEY, JSON.stringify(opt)); } catch (e) {} }
@@ -66,7 +70,7 @@
   setInterval(function () {
     var sc = document.body.dataset.screen;
     if (sc === 'login') art($('loginArt'), ['tat', 'yen', 'ze', 'xiang'], 3.1);
-    if (sc === 'title') art($('titleArt'), ['tat', 'yen'], 3.6);
+
   }, 60);
 
   // ---------- 标题 ----------
@@ -74,15 +78,26 @@
     stop(); show('title');
     var sv = loadSave();
     $('tContinue').style.display = sv ? '' : 'none';
+    if (sv) $('tContinue').textContent = '继续冒险（' + DATA.chapters[sv.ch || 0].title.split('：')[0] + '）';
     $('tSound').textContent = opt.sound ? '音效：开' : '音效：关';
-    $('chapName').textContent = DATA.title + '（2011 – 2012）';
+    var list = $('chapList'); list.innerHTML = '';
+    DATA.chapters.forEach(function (ch, i) {
+      var open = i === 0 || prog.done[i - 1], b = document.createElement('button');
+      b.className = 'chap' + (open ? '' : ' locked') + (prog.done[i] ? ' done' : '');
+      b.innerHTML = '<b>' + ch.title + '</b><span>' + ch.years + '</span>' + (prog.done[i] ? '<i>已完成</i>' : open ? '' : '<i>未解锁</i>');
+      b.disabled = !open;
+      b.onclick = function () { newChapter(i); };
+      list.appendChild(b);
+    });
   }
-  $('tNew').onclick = function () {
-    if (loadSave() && !$('tNew').dataset.sure) { $('tNew').dataset.sure = 1; $('tNew').textContent = '会覆盖旧进度，再按一次确认'; setTimeout(function () { delete $('tNew').dataset.sure; $('tNew').textContent = '新的冒险'; }, 3000); return; }
-    delete $('tNew').dataset.sure; $('tNew').textContent = '新的冒险';
-    try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
-    startGame(null);
-  };
+  function newChapter(i) {
+    var sv = loadSave();
+    if (sv && sv.ch === i && !confirmNew[i]) { confirmNew[i] = 1; toastTitle('这一章有存档，再按一次会重新开始'); setTimeout(function () { confirmNew[i] = 0; }, 3000); return; }
+    confirmNew[i] = 0;
+    startGame(null, i, i > 0 ? prog.carry[i - 1] : null);
+  }
+  var confirmNew = {};
+  function toastTitle(m) { var t = $('titleMsg'); t.textContent = m; setTimeout(function () { if (t.textContent === m) t.textContent = ''; }, 3000); }
   $('tContinue').onclick = function () { startGame(loadSave()); };
   $('tSound').onclick = function () { opt.sound = !opt.sound; saveOpt(); $('tSound').textContent = opt.sound ? '音效：开' : '音效：关'; };
   $('tLogout').onclick = function () { try { localStorage.removeItem('ffa_auth'); sessionStorage.removeItem('ffa_auth'); } catch (e) {} show('login'); };
@@ -94,18 +109,19 @@
   function resize() {
     var w = window.innerWidth, h = window.innerHeight, dpr = Math.min(window.devicePixelRatio || 1, 2);
     cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); cv.style.width = w + 'px'; cv.style.height = h + 'px';
-    var scale = Math.max(0.6, Math.min(h / 360, w / 420));
-    if (w > 1200 && h > 700) scale = Math.min(h / 420, w / 700);
+    var scale = Math.max(0.7, Math.min(h / 300, w / 360));
+    if (w > 1200 && h > 700) scale = Math.min(h / 380, w / 640);
     view = { w: w / scale, h: h / scale, scale: scale, dpr: dpr };
     document.body.classList.toggle('portrait', h > w);
   }
   window.addEventListener('resize', resize);
 
-  function startGame(sv) {
-    W = R.create(DATA, sv); parts = []; paused = false; overlay(null);
+  function startGame(sv, ch, carry) {
+    W = R.create(DATA, sv, ch, carry); parts = []; paused = false; overlay(null);
     show('play'); resize(); camX = W.p.x - view.w / 2; camY = W.p.y - view.h / 2;
     if (sv) toast('继续冒险！');
-    banner(W.area.name);
+    banner(W.data.title); setTimeout(function () { if (W) banner(W.area.name); }, 2600);
+    if (!sv) writeSave(W);
     hud(true); dialogUI();
     if (!raf) { last = performance.now(); acc = 0; raf = requestAnimationFrame(loop); }
   }
@@ -187,22 +203,27 @@
   }
   function txt(x, y, s, c, big) { parts.push({ x: x, y: y, vx: 0, vy: -0.7, g: 0, life: 50, txt: s, c: c || '#fff', big: big }); }
   function burst(x, y, c, n) { for (var i = 0; i < n; i++) parts.push({ x: x, y: y, vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4 - 1, g: 0.05, life: 25 + Math.random() * 15, c: c, r: 2 + Math.random() * 3 }); }
-  var ITEMNAME = { bento: '便当', eggs: '番茄炒蛋', ring: '戒指' };
+  var ITEMNAME = { bento: '便当', eggs: '番茄炒蛋', chicken: '芽菜鸡', ring: '戒指' };
   function handle(e) {
     switch (e.type) {
       case 'swing': sfx('swing'); break;
       case 'wave': sfx('wave'); break;
-      case 'dmg': sfx('hit'); txt(e.x, e.y, String(e.n), '#fff59d'); burst(e.x, e.y + 10, '#ffffff', 4); break;
+      case 'kick': sfx('swing'); break;
+      case 'ink': sfx('wave'); break;
+      case 'chess': sfx('spin'); toast('将军！附近的敌人被冻住了'); break;
+      case 'helper': sfx('shield'); toast('Xiang 画出了一个小帮手！'); break;
+      case 'stolen': sfx('bad'); txt(W.p.x, W.p.y - 60, '-' + e.n + ' 金币', '#ff8a65'); toast(e.by + '偷走了金币！'); break;
+      case 'dmg': sfx('hit'); txt(e.x, e.y - 20, String(e.n), '#fff59d'); burst(e.x, e.y + 10, '#ffffff', 4); break;
       case 'kill': sfx('kill'); burst(e.x, e.y, '#ffd54f', e.boss ? 40 : 12); txt(e.x, e.y - 20, '+' + e.exp + ' 经验', '#b9f6ca'); if (e.boss) shake = 20; break;
       case 'hurt': sfx('hurt'); shake = 8; txt(e.x, e.y - 30, '-' + e.n, '#ff5252'); break;
-      case 'levelup': sfx('levelup'); txt(W.p.x, W.p.y - 50, '升级！Lv' + e.lv, '#ffeb3b', true); toast('升级到 Lv' + e.lv + '！体力回满' + (e.lv === 2 ? '，Tat 学会“旋风扫把”（技能）' : '')); break;
-      case 'quest': sfx('quest'); toast('新任务：' + DATA.quests[e.id].t); hud(true); break;
+      case 'levelup': sfx('levelup'); txt(W.p.x, W.p.y - 70, '升级！Lv' + e.lv, '#ffeb3b', true); toast('升级到 Lv' + e.lv + '！体力回满' + (e.lv === 2 ? '，Tat 学会“旋风扫把”（技能）' : '')); break;
+      case 'quest': sfx('quest'); toast('新任务：' + W.data.quests[e.id].t); hud(true); break;
       case 'got': sfx('got'); if (!e.silent) toast('得到 ' + (ITEMNAME[e.item] || e.item) + ' ×' + e.n); break;
       case 'coins': txt(W.p.x, W.p.y - 40, '+' + e.n + ' 金币', '#ffd54f'); break;
       case 'gear': sfx('levelup'); toast('装备了新眼镜！攻击力 +2'); break;
       case 'join': sfx('levelup'); toast(CHARS[e.id].name + ' 加入了队伍！'); hud(true); break;
       case 'spin': sfx('spin'); shake = 6; break;
-      case 'shield': sfx('shield'); toast('口罩护盾！全队回血'); break;
+      case 'shield': sfx('shield'); toast(e.mask ? '口罩护盾！全队回血' : '爱心护盾！全队回血'); break;
       case 'dodge': sfx('dodge'); break;
       case 'swap': sfx('talk'); toast('换成 ' + CHARS[e.id].name); break;
       case 'swapDown': toast('体力用完，换 ' + CHARS[e.id].name + ' 上场！'); break;
@@ -216,7 +237,7 @@
       case 'quizBad': sfx('bad'); break;
       case 'summon': toast('它叫来了帮手！'); break;
       case 'chest': sfx('got'); burst(e.x, e.y, '#ffd54f', 16); break;
-      case 'end': sfx('end'); writeSave(W); setTimeout(showEnd, 600); break;
+      case 'end': sfx('end'); prog.done[W.ch] = true; prog.carry[W.ch] = R.carryData(W); saveProg(); try { localStorage.removeItem(SAVE_KEY); } catch (x) {} setTimeout(showEnd, 600); break;
     }
   }
   var toastT = 0;
@@ -225,7 +246,7 @@
   function banner(m) { var b = $('areaBanner'); b.textContent = m; b.classList.add('show'); clearTimeout(bannerT); bannerT = setTimeout(function () { b.classList.remove('show'); }, 2500); }
 
   // ---------- 对话框 ----------
-  var lastDlg = null;
+  var lastDlg = null, noFace = {};
   function dialogUI() {
     var d = W && W.dialog; lastDlg = d;
     $('dialog').classList.toggle('show', !!d);
@@ -238,9 +259,11 @@
     else { name = ''; face = null; }
     $('dlgName').textContent = name; $('dlgName').style.display = name ? '' : 'none';
     $('dlgText').textContent = d.t;
-    var fc = $('dlgFace'), fx = fc.getContext('2d'); fx.clearRect(0, 0, 96, 96);
-    fc.style.display = face ? '' : 'none';
-    if (face) drawChar(fx, face, 48, 150, { s: 3.2, noShadow: true, time: 60, bride: face === 'yen' && W.looks.yen === 'bride' });
+    var fc = $('dlgFace'), fx = fc.getContext('2d'), img = $('dlgImg'); fx.clearRect(0, 0, 96, 96);
+    if (face && FACE[face] && !noFace[face]) {
+      img.onerror = function () { noFace[face] = 1; img.style.display = 'none'; fc.style.display = ''; drawChar(fx, face, 48, 150, { s: 3.2, noShadow: true, time: 60 }); };
+      img.src = FACE[face]; img.style.display = ''; fc.style.display = 'none'; }
+    else { img.style.display = 'none'; fc.style.display = face ? '' : 'none'; if (face) drawChar(fx, face, 48, 150, { s: 3.2, noShadow: true, time: 60 }); }
     $('dialog').classList.toggle('sys', !name);
     var o = $('dlgOpts'); o.innerHTML = '';
     if (d.type !== 'say') {
@@ -259,18 +282,18 @@
     var h = '';
     W.party.forEach(function (m, i) {
       var mx = R.maxHp(W, m.id), pc = Math.max(0, m.hp / mx * 100);
-      h += '<div class="pm' + (i === W.active ? ' act' : '') + (m.hp <= 0 ? ' ko' : '') + '"><canvas data-id="' + m.id + '" width="44" height="44"></canvas><div><b>' + CHARS[m.id].name + '</b><i class="hp"><i style="width:' + pc + '%"></i></i><small>' + m.hp + '/' + mx + '</small></div></div>';
+      h += '<div class="pm' + (i === W.active ? ' act' : '') + (m.hp <= 0 ? ' ko' : '') + '"><img src="' + FACE[m.id] + '" alt="" onerror="this.style.visibility=\'hidden\'"><div><b>' + CHARS[m.id].name + '</b><i class="hp"><i style="width:' + pc + '%"></i></i><small>' + m.hp + '/' + mx + '</small></div></div>';
     });
     var key = h + W.looks.yen;
     if (force || key !== hudCache) {
       hudCache = key; $('party').innerHTML = h;
-      Array.prototype.forEach.call($('party').querySelectorAll('canvas'), function (c) { drawChar(c.getContext('2d'), c.dataset.id, 22, 68, { s: 1.6, noShadow: true, time: 60, bride: c.dataset.id === 'yen' && W.looks.yen === 'bride' }); });
+
     }
     var xi = R.expInfo(W);
     $('lv').textContent = 'Lv' + xi.lv; $('xp').style.width = Math.min(100, xi.cur / xi.need * 100) + '%';
-    $('coins').textContent = W.coins; $('nBento').textContent = W.items.bento || 0; $('nEggs').textContent = W.items.eggs || 0;
-    $('bEggs').style.display = W.items.eggs ? '' : 'none';
-    var q = W.quest && DATA.quests[W.quest]; $('questT').textContent = q ? q.t : '';
+    $('coins').textContent = W.coins; $('nBento').textContent = W.items.bento || 0; $('nEggs').textContent = W.items.eggs || 0; $('nChicken').textContent = W.items.chicken || 0;
+    $('bEggs').style.display = W.items.eggs ? '' : 'none'; $('bChicken').style.display = W.items.chicken ? '' : 'none';
+    var q = W.quest && W.data.quests[W.quest]; $('questT').textContent = q ? q.t : '';
     var boss = W.enemies.filter(function (e) { return e.boss && e.alive && e.aggro; })[0];
     $('bossBar').classList.toggle('show', !!boss);
     if (boss) { $('bossName').textContent = boss.st.name; $('bossHp').style.width = Math.max(0, boss.hp / boss.maxHp * 100) + '%'; }
@@ -278,26 +301,31 @@
     $('bAtk').textContent = it && !near ? '对话' : '攻击';
     $('bSwap').style.display = W.party.length > 1 ? '' : 'none';
     var id = R.member(W).id;
-    $('bSkill').firstChild.nodeValue = id === 'tat' ? (W.level < 2 ? 'Lv2解锁' : '旋风') : '护盾';
-    $('skillCd').style.height = (p.skillCd > 0 ? p.skillCd / (id === 'tat' ? 240 : 480) * 100 : 0) + '%';
+    $('bSkill').firstChild.nodeValue = { tat: W.level < 2 ? 'Lv2解锁' : '旋风', yen: W.data.yenSkill === 'mask' ? '口罩' : '爱心', ze: '将军', xiang: '帮手' }[id];
+    $('skillCd').style.height = (p.skillCd > 0 ? p.skillCd / ({ tat: 240, yen: W.data.yenSkill === 'mask' ? 420 : 480, ze: 420, xiang: 600 }[id]) * 100 : 0) + '%';
   }
   $('bBento').onclick = function () { if (W) { R.useItem(W, 'bento'); W.events.forEach(handle); W.events.length = 0; hud(true); } };
+  $('bChicken').onclick = function () { if (W) { R.useItem(W, 'chicken'); W.events.forEach(handle); W.events.length = 0; hud(true); } };
   $('bEggs').onclick = function () { if (W) { R.useItem(W, 'eggs'); W.events.forEach(handle); W.events.length = 0; hud(true); } };
   $('bMenu').onclick = togglePause;
   function togglePause() {
     if (!W || W.ended) return;
     paused = !paused; overlay(paused ? 'ovPause' : null); keys = {}; resetTouch();
-    if (paused) { var xi = R.expInfo(W); $('pStats').innerHTML = '等级 Lv' + xi.lv + '　金币 ' + W.coins + '　便当 ' + (W.items.bento || 0) + (W.gear.glasses ? '<br>装备：新眼镜（攻击 +2）' : '') + '<br>任务：' + (DATA.quests[W.quest] ? DATA.quests[W.quest].t : ''); }
+    if (paused) { var xi = R.expInfo(W); $('pStats').innerHTML = W.data.title + '<br>等级 Lv' + xi.lv + '　金币 ' + W.coins + '　便当 ' + (W.items.bento || 0) + (W.gear.glasses ? '<br>装备：新眼镜（攻击 +2）' : '') + '<br>任务：' + (W.data.quests[W.quest] ? W.data.quests[W.quest].t : ''); }
   }
   $('pResume').onclick = togglePause;
   $('pTitle').onclick = function () { paused = false; overlay(null); writeSave(W); openTitle(); };
   function showEnd() {
     overlay('ovEnd');
-    art($('endArt'), ['tat', 'yen'], 2.4);
+    var last = W.ch + 1 >= DATA.chapters.length;
+    $('endTitle').textContent = last ? '全部章节完成！' : W.data.title.split('：')[0] + '完成！';
+    $('endFaces').innerHTML = W.party.map(function (m) { return '<img src="' + FACE[m.id] + '" alt="" onerror="this.style.display=\'none\'">'; }).join('');
     var xi = R.expInfo(W);
-    $('endInfo').innerHTML = 'Tat 和 Yen 结婚啦！<br>等级 Lv' + xi.lv + '　金币 ' + W.coins + (W.flags.quiz1 ? '' : '<br>（小提示：公司里的八卦同事还有一道题哦）') + '<br><br>下一章：' + DATA.next;
+    $('endInfo').innerHTML = W.data.endText + '<br>等级 Lv' + xi.lv + '　金币 ' + W.coins + (last ? '<br><br>谢谢你玩我们家的故事！' : '<br><br>下一章：' + DATA.chapters[W.ch + 1].title);
+    $('eNext').style.display = last ? 'none' : '';
   }
   $('eTitle').onclick = function () { overlay(null); openTitle(); };
+  $('eNext').onclick = function () { var n = W.ch + 1; overlay(null); startGame(null, n, prog.carry[n - 1]); };
 
   // ---------- 绘制 ----------
   function render() {
@@ -322,5 +350,5 @@
   window.addEventListener('touchstart', function () { document.body.classList.add('touch'); }, { once: true, passive: true });
   if (authed()) openTitle(); else show('login');
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) navigator.serviceWorker.register('sw.js').catch(function () {});
-  window.RPGGAME = { get W() { return W; }, start: startGame, get paused() { return paused; } };
+  window.RPGGAME = { get W() { return W; }, start: startGame, get paused() { return paused; }, get prog() { return prog; } };
 })();

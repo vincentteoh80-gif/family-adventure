@@ -3,18 +3,19 @@
   'use strict';
   var CHARS = {
     tat:   { name: 'Tat',   role: '爸爸', skill: '任劳任怨：多 1 条命', size: 1.0, wide: 1.0,
-             skin: '#ffd8bc', hair: '#1c1a1f', shirt: '#b47cc7', shirt2: '#9a62ae', pants: '#36476b', shoe: '#2b2b2b', style: 'spiky' },
+             skin: '#ffd6b8', hair: '#2b1c14', shirt: '#b98ab8', shirt2: '#a06f9f', pants: '#36476b', shoe: '#2b2b2b', style: 'messy' },
     yen:   { name: 'Yen',   role: '妈妈', skill: '裙摆飘飘：空中按住跳会慢慢飘', size: 0.97, wide: 0.95,
-             skin: '#ffdcc6', hair: '#4a2a20', shirt: '#f7a9c4', shirt2: '#ee8fb0', pants: '#5a72b0', shoe: '#c2185b', style: 'long' },
+             skin: '#ffe2d0', hair: '#4a2518', hair2: '#7a3f28', shirt: '#f6b5c9', shirt2: '#ee93b2', pants: '#5a72b0', shoe: '#d81b60', style: 'long', pretty: true },
     ze:    { name: 'Ze',    role: '大儿子', skill: '足球小将：跑得最快', size: 0.9, wide: 0.9,
-             skin: '#ffd9bf', hair: '#18181b', shirt: '#f7f7f7', shirt2: '#1f8f4e', pants: '#2d3a58', shoe: '#1f8f4e', style: 'neat' },
+             skin: '#ffd9bf', hair: '#1e1612', shirt: '#f7f7f7', shirt2: '#1f8f4e', pants: '#2d3a58', shoe: '#1f8f4e', style: 'messy' },
     xiang: { name: 'Xiang', role: '小儿子', skill: '弹跳达人：跳得最高', size: 0.82, wide: 1.08,
-             skin: '#ffdcc2', hair: '#232326', shirt: '#ffffff', shirt2: '#e53935', pants: '#2f4a6b', shoe: '#e53935', style: 'buzz' },
+             skin: '#ffdcc2', hair: '#2a1d16', shirt: '#ffffff', shirt2: '#e53935', pants: '#2f4a6b', shoe: '#e53935', style: 'buzz' },
     // 配角（不戴眼镜）
     amin:  { name: '阿明', role: '同事', size: 1.0, wide: 1.05, skin: '#f2c9a5', hair: '#3e2723', shirt: '#64b5f6', shirt2: '#1e88e5', pants: '#455a64', shoe: '#3e2723', style: 'neat', noGlasses: true },
     lily:  { name: '八卦同事', role: '同事', size: 0.97, wide: 0.95, skin: '#ffe0cc', hair: '#8d4a2b', shirt: '#ffd54f', shirt2: '#ffb300', pants: '#6d4c41', shoe: '#6d4c41', style: 'long', noGlasses: true },
     booth: { name: '售票员', role: '', size: 0.97, wide: 0.95, skin: '#ffdcc6', hair: '#212121', shirt: '#e53935', shirt2: '#b71c1c', pants: '#263238', shoe: '#263238', style: 'long', noGlasses: true },
     pop:   { name: '爆米花阿伯', role: '', size: 1.0, wide: 1.15, skin: '#e8b98e', hair: '#bdbdbd', shirt: '#fff8e1', shirt2: '#ff7043', pants: '#5d4037', shoe: '#3e2723', style: 'buzz', noGlasses: true },
+    auntie: { name: '阿姨', role: '', size: 0.97, wide: 1.1, skin: '#f0c8a0', hair: '#5d4037', shirt: '#4db6ac', shirt2: '#00897b', pants: '#5d4037', shoe: '#3e2723', style: 'buzz', noGlasses: true },
     host:  { name: '主持人', role: '', size: 1.0, wide: 1.0, skin: '#f5cba7', hair: '#1a1a1a', shirt: '#37474f', shirt2: '#ffffff', pants: '#263238', shoe: '#111', style: 'neat', noGlasses: true }
   };
   var LINE = '#4a3426';
@@ -45,9 +46,11 @@
     ctx.translate(0, bob);
     // 长发（后面）
     if (C.style === 'long') {
+      var hl = C.pretty ? -7 : -14;
       ctx.fillStyle = C.hair; ctx.beginPath();
-      ctx.moveTo(-14, -36); ctx.quadraticCurveTo(-17, -18, -12, -14); ctx.lineTo(12, -14); ctx.quadraticCurveTo(17, -18, 14, -36); ctx.closePath();
+      ctx.moveTo(-14.5, -38); ctx.quadraticCurveTo(-19, -20, -14, hl); ctx.quadraticCurveTo(0, hl + 3, 14, hl); ctx.quadraticCurveTo(19, -20, 14.5, -38); ctx.closePath();
       ctx.fill(); ctx.stroke();
+      if (C.hair2) { ctx.strokeStyle = C.hair2; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(-13, -30); ctx.quadraticCurveTo(-16, -18, -12, hl + 2); ctx.moveTo(13, -30); ctx.quadraticCurveTo(16, -18, 12, hl + 2); ctx.stroke(); ctx.strokeStyle = LINE; ctx.lineWidth = LW; }
     }
     // 腿
     var legY = -9;
@@ -106,7 +109,14 @@
 
     // 头发
     ctx.fillStyle = C.hair;
-    if (C.style === 'spiky') {
+    if (C.style === 'messy') {
+      ctx.beginPath();
+      ctx.moveTo(-13.8, hy + 3); ctx.quadraticCurveTo(-16, hy - 14, 0, hy - 15.5); ctx.quadraticCurveTo(15, hy - 15, 15, hy + 1);
+      ctx.lineTo(12.5, hy - 4); ctx.quadraticCurveTo(10, hy - 3, 8, hy - 7); ctx.quadraticCurveTo(5, hy - 3, 1, hy - 6); ctx.quadraticCurveTo(-3, hy - 2, -6, hy - 6); ctx.quadraticCurveTo(-9, hy - 3, -11, hy - 4); ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-8, hy - 13); ctx.quadraticCurveTo(-4, hy - 19, 0, hy - 14.5); ctx.quadraticCurveTo(4, hy - 20, 8, hy - 14); ctx.quadraticCurveTo(12, hy - 17, 12, hy - 11); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.beginPath(); ctx.moveTo(-5, hy - 11); ctx.quadraticCurveTo(1, hy - 14, 7, hy - 11); ctx.stroke(); ctx.strokeStyle = LINE;
+    } else if (C.style === 'spiky') {
       ctx.beginPath();
       ctx.moveTo(-13.5, hy + 1); ctx.quadraticCurveTo(-14, hy - 13, 1, hy - 13.5); ctx.quadraticCurveTo(14, hy - 13, 14.6, hy - 1);
       ctx.lineTo(11, hy - 6); ctx.lineTo(8, hy - 2.5); ctx.lineTo(5, hy - 7); ctx.lineTo(1, hy - 3); ctx.lineTo(-3, hy - 7); ctx.lineTo(-7, hy - 3.5); ctx.lineTo(-10, hy - 5); ctx.closePath();
@@ -114,8 +124,8 @@
       ctx.beginPath(); ctx.moveTo(-6, hy - 13); ctx.lineTo(-3, hy - 17); ctx.lineTo(0, hy - 13.4); ctx.lineTo(4, hy - 17.5); ctx.lineTo(6, hy - 13); ctx.lineTo(10, hy - 15.5); ctx.lineTo(10, hy - 11); ctx.fill();
     } else if (C.style === 'long') {
       ctx.beginPath();
-      ctx.moveTo(-14.5, hy + 8); ctx.quadraticCurveTo(-16, hy - 14, 2, hy - 14); ctx.quadraticCurveTo(16, hy - 13, 15.5, hy + 8);
-      ctx.quadraticCurveTo(13, hy - 2, 9, hy - 6); ctx.quadraticCurveTo(2, hy - 1, -6, hy - 7); ctx.quadraticCurveTo(-11, hy - 3, -12, hy + 8); ctx.closePath();
+      ctx.moveTo(-14.5, hy + 10); ctx.quadraticCurveTo(-17, hy - 15, 2, hy - 14.5); ctx.quadraticCurveTo(17, hy - 14, 15.8, hy + 10);
+      ctx.quadraticCurveTo(14, hy - 2, 11, hy - 5); ctx.quadraticCurveTo(4, hy - 4, -4, hy - 9); ctx.quadraticCurveTo(-10, hy - 5, -12, hy + 10); ctx.closePath();
       ctx.fill(); ctx.stroke();
       ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.beginPath(); ctx.moveTo(-6, hy - 11); ctx.quadraticCurveTo(2, hy - 13, 8, hy - 10); ctx.stroke(); ctx.strokeStyle = LINE;
     } else if (C.style === 'neat') {
@@ -137,13 +147,16 @@
     ctx.fillStyle = '#2b1d16';
     if (blink) { ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(ex1 - 2, ey); ctx.lineTo(ex1 + 2, ey); ctx.moveTo(ex2 - 2, ey); ctx.lineTo(ex2 + 2, ey); ctx.stroke(); }
     else {
-      ctx.beginPath(); ctx.ellipse(ex1, ey, 1.9, 2.4, 0, 0, 7); ctx.ellipse(ex2, ey, 1.9, 2.4, 0, 0, 7); ctx.fill();
-      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(ex1 + 0.7, ey - 0.9, 0.7, 0, 7); ctx.arc(ex2 + 0.7, ey - 0.9, 0.7, 0, 7); ctx.fill();
+      var er = C.pretty ? 1.15 : 1;
+      ctx.beginPath(); ctx.ellipse(ex1, ey, 1.9 * er, 2.4 * er, 0, 0, 7); ctx.ellipse(ex2, ey, 1.9 * er, 2.4 * er, 0, 0, 7); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(ex1 + 0.7, ey - 0.9, 0.75, 0, 7); ctx.arc(ex2 + 0.7, ey - 0.9, 0.75, 0, 7); ctx.fill();
+      if (C.pretty) { ctx.strokeStyle = '#1a0f0a'; ctx.lineWidth = 0.9; ctx.beginPath();
+        ctx.moveTo(ex1 - 2, ey - 2); ctx.lineTo(ex1 - 3.2, ey - 3.2); ctx.moveTo(ex2 + 2, ey - 2); ctx.lineTo(ex2 + 3.2, ey - 3.2); ctx.stroke(); ctx.strokeStyle = LINE; ctx.lineWidth = LW; }
     }
     // 眼镜（四个家人都戴）
     if (!C.noGlasses) {
-    ctx.lineWidth = 1.7; ctx.strokeStyle = '#111';
-    ctx.fillStyle = 'rgba(200,230,255,0.25)';
+    ctx.lineWidth = (id === 'tat' || id === 'ze') ? 1.3 : 1.7; ctx.strokeStyle = '#111';
+    ctx.fillStyle = 'rgba(220,240,255,0.12)';
     rr(ctx, ex1 - 4.6, ey - 3.6, 9.2, 7.2, 2.2); ctx.fill(); ctx.stroke();
     rr(ctx, ex2 - 4.6, ey - 3.6, 9.2, 7.2, 2.2); ctx.fill(); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(ex1 + 4.6, ey - 1); ctx.lineTo(ex2 - 4.6, ey - 1); ctx.moveTo(ex1 - 4.6, ey - 1); ctx.lineTo(-12, ey - 2); ctx.stroke();
@@ -155,8 +168,8 @@
     ctx.beginPath(); ctx.ellipse(-6, hy + 6.5, 2.6, 1.6, 0, 0, 7); ctx.ellipse(11, hy + 6.5, 2.4, 1.5, 0, 0, 7); ctx.fill();
     if (o.hurt) { ctx.fillStyle = '#7a2e2e'; ctx.beginPath(); ctx.ellipse(3, hy + 8, 2, 2.4, 0, 0, 7); ctx.fill(); }
     else {
-      ctx.strokeStyle = id === 'yen' ? '#d0506e' : '#7a3b2e'; ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.arc(3, hy + 5.2, 3.2, 0.25, Math.PI - 0.25); ctx.stroke();
+      if (C.pretty) { ctx.fillStyle = '#e0566f'; ctx.beginPath(); ctx.moveTo(0.5, hy + 6.6); ctx.quadraticCurveTo(3, hy + 5.6, 5.5, hy + 6.6); ctx.quadraticCurveTo(3, hy + 9.2, 0.5, hy + 6.6); ctx.fill(); }
+      else { ctx.strokeStyle = '#7a3b2e'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(3, hy + 5.2, 3.2, 0.25, Math.PI - 0.25); ctx.stroke(); }
     }
     if (o.bride) { // 头纱 + 花
       ctx.fillStyle = 'rgba(255,255,255,0.75)'; ctx.beginPath(); ctx.moveTo(-6, hy - 12); ctx.quadraticCurveTo(-22, hy - 4, -20, hy + 22); ctx.lineTo(-10, hy + 20); ctx.quadraticCurveTo(-12, hy, -2, hy - 12); ctx.fill();

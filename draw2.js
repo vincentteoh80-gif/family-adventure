@@ -24,6 +24,7 @@
       case 'egg': ctx.fillStyle = '#fffde7'; ctx.beginPath(); ctx.ellipse(0, 0, 8, 11, 0, 0, 7); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-3, -4, 2, 0, 7); ctx.fill(); break;
       case 'gourd': ctx.rotate(0.5); ctx.fillStyle = '#7cb342'; ctx.beginPath(); ctx.ellipse(0, 0, 6, 15, 0, 0, 7); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#558b2f'; for (var k = -2; k <= 2; k++) { ctx.beginPath(); ctx.arc(-2, k * 5, 1.5, 0, 7); ctx.arc(2, k * 5 + 2, 1.5, 0, 7); ctx.fill(); }
         ctx.rotate(-0.5); ctx.strokeStyle = '#c62828'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(0, 0, 15, 0, 7); ctx.moveTo(-10, -10); ctx.lineTo(10, 10); ctx.stroke(); break;
+      case 'gourdplain': ctx.rotate(0.5); ctx.fillStyle = '#7cb342'; ctx.beginPath(); ctx.ellipse(0, 0, 7, 16, 0, 0, 7); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#558b2f'; for (var k2 = -2; k2 <= 2; k2++) { ctx.beginPath(); ctx.arc(-2, k2 * 5, 1.5, 0, 7); ctx.arc(2, k2 * 5 + 2, 1.5, 0, 7); ctx.fill(); } break;
       case 'dish': ctx.fillStyle = '#fff59d55'; ctx.beginPath(); ctx.arc(0, 0, 19, 0, 7); ctx.fill(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(0, 4, 14, 6, 0, 0, 7); ctx.fill(); ctx.stroke();
         ctx.fillStyle = '#ffd54f'; ctx.beginPath(); ctx.ellipse(-3, 0, 7, 4, 0, 0, 7); ctx.fill(); ctx.fillStyle = '#e53935'; ctx.beginPath(); ctx.arc(4, 0, 3.5, 0, 7); ctx.arc(-1, -2, 3, 0, 7); ctx.fill(); break;
       default: done = false;

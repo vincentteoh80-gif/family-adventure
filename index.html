@@ -38,21 +38,23 @@
 <!-- 标题菜单 -->
 <section id="title" class="screen">
   <div class="title-wrap">
-    <canvas id="titleArt" width="640" height="220"></canvas>
+    <div class="faces"><img src="face-tat.png" alt="" onerror="this.style.display='none'"><img src="face-yen.png" alt="" onerror="this.style.display='none'"><img src="face-ze.png" alt="" onerror="this.style.display='none'"><img src="face-xiang.png" alt="" onerror="this.style.display='none'"></div>
     <h1>一家四口的冒险</h1>
-    <p class="sub" id="chapName">第一章：相遇与婚礼（2011 – 2012）</p>
+    <p class="sub">Since 2011 · 我们家真实的故事</p>
     <div class="title-btns">
       <button class="btn big" id="tContinue">继续冒险</button>
-      <button class="btn big" id="tNew">新的冒险</button>
-      <a class="btn ghost" href="classic.html">经典闯关小游戏</a>
     </div>
+    <h2 class="chap-h">选择章节</h2>
+    <div id="chapList" class="chap-list"></div>
+    <p id="titleMsg" class="msg"></p>
+    <div class="title-btns"><a class="btn ghost" href="classic.html">经典闯关小游戏</a></div>
     <div class="title-small">
       <button class="btn small ghost" id="tSound">音效：开</button>
       <button class="btn small ghost" id="tLogout">退出登录</button>
     </div>
     <div class="help">
       <b>电脑：</b>WASD / 方向键 走路，<b>J 或 空格</b> 攻击，<b>K</b> 技能，<b>L 或 Shift</b> 闪避，<b>Q</b> 换人，<b>E 或 Enter</b> 对话，<b>H</b> 吃便当。<br>
-      <b>手机：</b>左下角摇杆走路，右下角按钮攻击 / 技能 / 闪避 / 换人。靠近人物时“攻击”键会变成“对话”。<br>
+      <b>手机：</b>左下角摇杆走路，右下角按钮攻击 / 技能 / 闪避 / 换人。靠近人物时“攻击”键会变成“对话”。<br>技能：Tat 旋风扫把、Yen 爱心护盾（2020 年起变成口罩护盾）、Ze 将军（冻住敌人）、Xiang 画小帮手。<br>
       打怪拿经验升级，升级会变强。黄色箭头指向当前任务。碰到 <b>相框</b> 会存档并回满体力。
     </div>
   </div>
@@ -69,6 +71,7 @@
   <div id="hudR">
     <button class="ibtn2" id="bBento" title="吃便当">便当 <b id="nBento">0</b></button>
     <button class="ibtn2" id="bEggs" title="番茄炒蛋">番茄炒蛋 <b id="nEggs">0</b></button>
+    <button class="ibtn2" id="bChicken" title="芽菜鸡">芽菜鸡 <b id="nChicken">0</b></button>
     <button class="ibtn2" id="bMenu">菜单</button>
   </div>
   <div id="bossBar"><span id="bossName"></span><i><i id="bossHp"></i></i></div>
@@ -76,6 +79,7 @@
   <div id="toast"></div>
 
   <div id="dialog">
+    <img id="dlgImg" alt="" style="display:none">
     <canvas id="dlgFace" width="96" height="96"></canvas>
     <div class="dlg-body">
       <div id="dlgName"></div>
@@ -105,11 +109,12 @@
   </div></div>
 
   <div id="ovEnd" class="overlay"><div class="card">
-    <h2>第一章完成！</h2>
-    <canvas id="endArt" width="400" height="150"></canvas>
+    <h2 id="endTitle">完成！</h2>
+    <div id="endFaces" class="faces small"></div>
     <p class="story" id="endInfo"></p>
     <div class="row">
-      <button class="btn big" id="eTitle">回主菜单</button>
+      <button class="btn big" id="eNext">下一章</button>
+      <button class="btn ghost" id="eTitle">回主菜单</button>
     </div>
   </div></div>
 </section>
